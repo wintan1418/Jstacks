@@ -1,0 +1,156 @@
+class UploadsController < ApplicationController
+    require 'faraday'
+    require 'zip'
+  
+    def create
+      @upload = current_user.uploads.new(upload_params)
+      if @upload.save
+        @upload.images.attach(params[:upload][:images])
+        zip_file_path = create_zip_file(@upload.images)
+        
+        # Create Faraday connection
+        conn = Faraday.new(:url => 'https://app.88stacks.com')
+  
+        # Send the zip file to the 88stacks API
+        response = conn.post do |req|
+          req.url '/models'
+          req.headers['Content-Type'] = 'application/zip'
+          req.headers['Authorization'] = "J8xSJVC6a5fbzYY1wLbZQ6sU"
+          req.body = File.read(zip_file_path)
+        end
+  
+        if response.success?
+          flash[:success] = "Model created successfully"
+        else
+          flash[:error] = "Error creating model: #{response.body}"
+        end
+  
+        redirect_to upload_path(@upload)
+      else
+        render :show
+      end
+    ensure
+      File.delete(zip_file_path) if zip_file_path
+    end
+  
+    private
+      def create_zip_file(images)
+        zip_file_path = "#{Rails.root}/tmp/upload_#{Time.now.to_i}.zip"
+        Zip::File.open(zip_file_path, Zip::File::CREATE) do |zipfile|
+          images.each do |image|
+            zipfile.add(image.filename, image.path)
+          end
+        end
+        zip_file_path
+      end
+  
+      def upload_params
+        params.require(:upload).permit(:images)
+      end
+  end
+  
+
+
+  ==========================================================================
+
+  <% if @upload.images.attached? %>
+    <% if @upload.images.first.variant(resize: "300x300").processed? %>
+     <% @upload.images.each do |image| %>
+       <%= image_tag image.variant(resize: "300x300").processed.service_url %>
+     <% end %>
+   <% else %>
+     <p>Images are not ready to be displayed yet. Please try again later.</p>
+   <% end %>
+ <% else %>
+   <p>Images are not attached.</p>
+ <% end %>
+
+
+
+ ==================================================================================================================
+
+ 
+
+
+
+Oluwadare Juwon
+I was asked to create a 4 page rails app where user registers and pay 10$ ..which I have done and is working then from there I would after payment is confirmed, you go to a unique page where the email and stripe id is stored. Then a form to uplaod files appears. which is this form <div class="bg-white p-6 rounded-lg">
+  <h1 class="text-lg font-medium mb-4">Thanks for paying, <%= @payment.email %>!</p>
+
+  <%= form_for @upload, html: { multipart: true } do |f| %>
+    <div class="relative rounded-md shadow-sm">
+      <%= f.file_field :images, multiple: true, class: "form-input py-3 px-4 block w-full leading-5 rounded-md transition duration-150 ease-in-out" %>
+    </div>
+ <div class="mt-4">
+  <%= f.submit "Create Upload", class: "px-4 py-2 font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-500 focus:outline-none focus:shadow-outline-indigo active:bg-indigo-600" %>
+</div>
+  <% end %>
+</div>
+this is the next requirement after the images are uploaded, all the images are sent to the 88stacks api to create an image generator model (read the docs). You send a zip file to a public link of the images to the model POST endpoint.
+:
+https://app.88stacks.com/docs/1.0/models/create.en.html this    require 'faraday'
+    require 'zip'
+  
+    def new
+      @upload = Upload.new
+    end
+  
+    def create
+      @upload = current_user.uploads.new(upload_params)
+      if @upload.save
+        params[:upload][:images].each do |image|
+          @upload.images.attach(image)
+        end
+        zip_file_path = create_zip_file(@upload.images)
+  
+        # Create Faraday connection
+        conn = Faraday.new(:url => 'https://app.88stacks.com')
+  
+        # Send the zip file to the 88stacks API
+        response = conn.post do |req|
+          req.url '/models'
+          req.headers['Content-Type'] = 'application/zip'
+          req.headers['Authorization'] = "J8xSJVC6a5fbzYY1wLbZQ6sU"
+          req.body = File.read(zip_file_path)
+        end
+  
+        if response.status == 201
+          flash[:success] = "Model created successfully"
+          redirect_to upload_path(@upload)
+        else
+          flash[:error] = "Error creating model: #{response.body}"
+          render :new
+        end
+      else
+        render :new
+      end
+    ensure
+      File.delete(zip_file_path) if zip_file_path
+    end
+  
+    def show
+      @upload = Upload.find(params[:id])
+      if @upload.images.attached?
+        # images are processed and ready to be displayed
+      else
+        @upload.images.purge
+        # images are not processed or have been purged
+      end
+    end
+  
+    def create_zip_file(images)
+      zip_file_path = "#{Rails.root}/tmp/upload_#{Time.now.to_i}.zip"
+      Zip::File.open(zip_file_path, Zip::File::CREATE) do |zipfile|
+        images.each do |image|
+          zipfile.add(image.filename, image.path)
+        end
+      end
+      zip_file_path
+    end
+    private
+
+    def upload_params
+        params.require(:upload).permit(images: [:file, :filename, :content_type, :headers])
+    end
+  end but..the image is not even uploading or saving let alone been sent to 88stacks... this is the comprehensive breakdown of the code and the requirements and challenge
+ 

@@ -1,0 +1,12 @@
+<div class="bg-white p-6 rounded-lg">
+  <h1 class="text-lg font-medium mb-4">Thanks for paying, <%= @payment.email %>!</p>
+
+  <%= form_for @upload, html: { multipart: true } do |f| %>
+    <div class="relative rounded-md shadow-sm">
+      <%= f.file_field :images, multiple: true, class: "form-input py-3 px-4 block w-full leading-5 rounded-md transition duration-150 ease-in-out" %>
+    </div>
+ <div class="mt-4">
+  <%= f.submit "Create Upload", class: "px-4 py-2 font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-500 focus:outline-none focus:shadow-outline-indigo active:bg-indigo-600" %>
+</div>
+  <% end %>
+</div>

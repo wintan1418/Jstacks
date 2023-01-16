@@ -1,0 +1,9 @@
+<h1>Uploaded Images</h1>
+<% if @upload.images.attached? %>
+  <% @upload.images.each do |image| %>
+   <%= image_tag url_for(image) %>
+
+  <% end %>
+<% else %>
+  <p>Images are not ready to be displayed yet</p>
+<% end %>

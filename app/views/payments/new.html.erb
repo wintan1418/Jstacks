@@ -1,0 +1,76 @@
+
+<%= form_with model: @payment, url: payments_path, method: :post, id: "payment-form" do |form| %>
+  <%= form.label :email %>
+  <%= form.text_field :email, id: "email" %>
+  <label for="card-element">Card</label>
+  <div id="card-element"></div>
+  <%= form.submit "Pay $10" %>
+<% end %>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  // Create an instance of the Stripe object
+  const stripe = Stripe('');
+
+  // Create an instance of Elements
+  const elements = stripe.elements();
+
+  // Create an instance of the card Element
+  const cardElement = elements.create('card');
+
+  // Add the card Element to the form
+  cardElement.mount('#card-element');
+
+  // Handle form submission
+  const form = document.getElementById('payment-form');
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    // Use the Stripe object to create a charge
+    stripe.createToken(cardElement).then((result) => {
+      if (result.error) {
+        // Display the error message to the user
+        alert(result.error.message);
+      } else {
+        // Send the token to the server to create the charge
+        const input = document.createElement('input');
+        input.setAttribute('type', 'hidden');
+        input.setAttribute('name', 'stripeToken');
+        input.setAttribute('value', result.token.id);
+        form.appendChild(input);
+        form.submit();
+      }
+    });
+  });
+</script>
+<style>
+  /* to give a checkout feel */
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  #card-element {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  label {
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  input[type="text"], input[type="email"], input[type="tel"] {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  input[type="submit"] {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 16px 32px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+</style>

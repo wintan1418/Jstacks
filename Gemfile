@@ -30,6 +30,7 @@ gem "jbuilder"
 # Use Redis adapter to run Action Cable in production
 gem "redis", "~> 4.0"
 
+
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
 
@@ -43,12 +44,18 @@ gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 gem "bootsnap", require: false
 gem 'stripe', '~> 8.0'
 gem 'devise', '~> 4.8', '>= 4.8.1'
+gem 'net-http', '~> 0.3.2'
+gem 'zip'
+gem 'rest-client'
+
+
+
 
 # Use Sass to process CSS
 # gem "sassc-rails"
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 1.2"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -74,3 +81,7 @@ group :test do
 end
 
 gem "tailwindcss-rails", "~> 2.0"
+gem 'carrierwave', '>= 3.0.0.beta', '< 4.0'
+gem 'activestorage'
+gem 'faraday'
+

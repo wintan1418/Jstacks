@@ -1,0 +1,5 @@
+<p>Thanks for paying, <%= @payment.email %>!</p>
+<%= form_for @uploader, html: { multipart: true } do |f| %>
+  <%= f.file_field :file %>
+  <%= f.submit %>
+<% end %>

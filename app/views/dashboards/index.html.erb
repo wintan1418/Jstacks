@@ -1,0 +1,17 @@
+
+<div class="flex h-screen justify-center items-center">
+    <div class="text-center">
+        <h1 class="text-2xl font-medium">Welcome to My App</h1>
+        <% if user_signed_in? %>
+            <%= link_to "Enroll", new_payment_path, class: "bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 mt-4" %>
+        <% else %>
+            <div class="flex justify-around mt-4">
+                <%= link_to "Sign Up", new_user_registration_path, class: "bg-green-500 text-white p-2 rounded-md hover:bg-green-600 mr-2" %>
+                <%= link_to "Sign In", new_user_session_path, class: "bg-indigo-500 text-white p-2 rounded-md hover:bg-indigo-600 mr-2" %>
+                <%= link_to 'Sign out', destroy_user_session_path, data: { turbo_method: :delete }, class: "bg-red-500 text-white p-2 rounded-md hover:bg-red-600 " %>
+            </div>
+        <% end %>
+    </div>
+</div>
+
+
